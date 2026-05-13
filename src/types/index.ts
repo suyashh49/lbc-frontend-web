@@ -1,0 +1,93 @@
+export interface Rider {
+  _id: string;
+  employeeId: string;
+  name: string;
+  email: string;
+  phone: string;
+  hub: string;
+  zone: string;
+  vehicleType: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DeliveryResult {
+  outcome: 'delivered' | 'failed';
+  timestamp: string;
+  signatureUri?: string;
+  photoUri?: string;
+  codCollected?: number;
+  failureReason?: string;
+  failureNotes?: string;
+  nextAction?: 'reschedule' | 'rts' | 'retry';
+  overrideReason?: string;
+}
+
+export interface Stop {
+  _id: string;
+  stopId: string;
+  manifestId: string | { _id: string; manifestId: string };
+  sequence: number;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'rts';
+  recipient: {
+    name: string;
+    phone: string;
+  };
+  address: {
+    text: string;
+    lat: number;
+    lng: number;
+    geocoded: boolean;
+  };
+  trackingNumber: string;
+  serviceType: string;
+  codAmount: number;
+  packageDetails: string;
+  specialInstructions: string;
+  distance: number;
+  eta: string;
+  attemptCount: number;
+  maxAttempts: number;
+  deliveryResult?: DeliveryResult;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Manifest {
+  _id: string;
+  manifestId: string;
+  riderId: string | Rider;
+  date: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  totalStops: number;
+  completedStops: number;
+  failedStops: number;
+  stops: string[] | Stop[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardStats {
+  riders: { total: number; active: number };
+  manifests: { total: number; today: number; active: number };
+  stops: {
+    total: number;
+    pending: number;
+    inProgress: number;
+    completed: number;
+    failed: number;
+    rts: number;
+  };
+  deliveryRate: number;
+  cod: { totalExpected: number; totalCollected: number };
+  recentActivity: Stop[];
+  serviceBreakdown: { _id: string; count: number }[];
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
