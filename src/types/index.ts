@@ -29,7 +29,7 @@ export interface Stop {
   stopId: string;
   manifestId: string | { _id: string; manifestId: string };
   sequence: number;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'rts';
+  status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'rts' | 'reschedule';
   recipient: {
     name: string;
     phone: string;
@@ -78,6 +78,7 @@ export interface DashboardStats {
     completed: number;
     failed: number;
     rts: number;
+    reschedule: number;
   };
   deliveryRate: number;
   cod: { totalExpected: number; totalCollected: number };

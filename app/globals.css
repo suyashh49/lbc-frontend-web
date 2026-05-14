@@ -213,6 +213,7 @@ tbody td { padding: 14px 16px; font-size: 13px; vertical-align: middle; }
 .badge-completed { background: var(--green-dim); color: var(--green); }
 .badge-failed { background: var(--rose-dim); color: var(--rose); }
 .badge-rts { background: var(--amber-dim); color: var(--amber); }
+.badge-reschedule { background: #FFF3E0; color: #E65100; }
 .badge-active { background: var(--green-dim); color: var(--green); }
 .badge-inactive { background: var(--rose-dim); color: var(--rose); }
 

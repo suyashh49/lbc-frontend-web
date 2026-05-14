@@ -8,6 +8,7 @@ const STATUS_COLORS: Record<string, string> = {
   completed: 'var(--green)',
   failed: 'var(--rose)',
   rts: 'var(--amber)',
+  reschedule: '#FF9800',
   pending: 'var(--purple)',
   in_progress: 'var(--blue)',
 };
@@ -37,16 +38,18 @@ export default function DashboardPage() {
     { label: 'Completed', value: stats.stops.completed, color: 'var(--green)' },
     { label: 'Failed', value: stats.stops.failed, color: 'var(--rose)' },
     { label: 'RTS', value: stats.stops.rts, color: 'var(--amber)' },
+    { label: 'Rescheduled', value: stats.stops.reschedule, color: '#FF9800' },
     { label: 'In Progress', value: stats.stops.inProgress, color: 'var(--blue)' },
     { label: 'Pending', value: stats.stops.pending, color: 'var(--purple)' },
   ];
   const maxStop = Math.max(...stopData.map(d => d.value), 1);
 
-  const donutTotal = stats.stops.completed + stats.stops.failed + stats.stops.rts;
+  const donutTotal = stats.stops.completed + stats.stops.failed + stats.stops.rts + stats.stops.reschedule;
   const donutSegments = [
     { pct: donutTotal ? (stats.stops.completed / donutTotal) * 100 : 0, color: 'var(--green)', label: 'Delivered' },
     { pct: donutTotal ? (stats.stops.failed / donutTotal) * 100 : 0, color: 'var(--rose)', label: 'Failed' },
     { pct: donutTotal ? (stats.stops.rts / donutTotal) * 100 : 0, color: 'var(--amber)', label: 'RTS' },
+    { pct: donutTotal ? (stats.stops.reschedule / donutTotal) * 100 : 0, color: '#FF9800', label: 'Rescheduled' },
   ];
 
   let cumulativeOffset = 0;
@@ -80,7 +83,7 @@ export default function DashboardPage() {
           <div className="kpi-icon" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>✓</div>
           <div className="kpi-label">Delivery Rate</div>
           <div className="kpi-value">{stats.deliveryRate}%</div>
-          <div className="kpi-sub">{stats.stops.completed} of {stats.stops.completed + stats.stops.failed + stats.stops.rts} attempted</div>
+          <div className="kpi-sub">{stats.stops.completed} of {stats.stops.completed + stats.stops.failed + stats.stops.rts + stats.stops.reschedule} attempted</div>
         </div>
         <div className="kpi-card" style={{ '--kpi-color': 'var(--amber)' } as React.CSSProperties}>
           <div className="kpi-icon" style={{ background: 'var(--amber-dim)', color: 'var(--amber)' }}>💰</div>

@@ -138,7 +138,7 @@ export default function StopsPage() {
             <input className="search-input" placeholder="Search tracking, recipient, address..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <select className="filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-            <option value="">All Status</option><option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="rts">RTS</option>
+            <option value="">All Status</option><option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="rts">RTS</option><option value="reschedule">Rescheduled</option>
           </select>
           <select className="filter-select" value={manifestFilter} onChange={e => setManifestFilter(e.target.value)}>
             <option value="">All Manifests</option>
@@ -168,8 +168,8 @@ export default function StopsPage() {
                   <td><span className="badge" style={{ background: 'var(--blue-dim)', color: 'var(--blue)' }}>{s.serviceType}</span></td>
                   <td>{s.codAmount > 0 ? `₱${s.codAmount.toLocaleString()}` : '—'}</td>
                   <td>
-                    <select className="filter-select" value={s.status} onChange={(e) => { e.stopPropagation(); updateStatus(s, e.target.value); }} onClick={e => e.stopPropagation()} style={{ fontSize: 11, padding: '4px 24px 4px 8px', minWidth: 100 }}>
-                      <option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="rts">RTS</option>
+                    <select className="filter-select" value={s.status} onChange={(e) => { e.stopPropagation(); updateStatus(s, e.target.value); }} onClick={e => e.stopPropagation()} style={{ fontSize: 11, padding: '4px 24px 4px 8px', minWidth: 110 }}>
+                      <option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="rts">RTS</option><option value="reschedule">Rescheduled</option>
                     </select>
                   </td>
                   <td>
