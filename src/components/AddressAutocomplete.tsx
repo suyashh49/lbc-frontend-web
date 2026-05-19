@@ -81,7 +81,7 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
         input,
         includedRegionCodes: ['ph'] // Restrict to Philippines
       });
-      
+
       setLoading(false);
       if (response && response.suggestions) {
         setPredictions(response.suggestions.map((s: any) => ({

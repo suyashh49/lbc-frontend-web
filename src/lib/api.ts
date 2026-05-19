@@ -173,6 +173,102 @@ class ApiClient {
       { method: 'DELETE' }
     );
   }
+
+  // ─── Orders (NEW) ───────────────────────────────
+
+  async getOrders(params?: { hub?: string; zone?: string; status?: string; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.hub) query.set('hub', params.hub);
+    if (params?.zone) query.set('zone', params.zone);
+    if (params?.status) query.set('status', params.status);
+    if (params?.search) query.set('search', params.search);
+    const qs = query.toString();
+    return this.request<{ orders: import('@/types').Order[]; total: number }>(
+      `/api/admin/orders${qs ? `?${qs}` : ''}`
+    );
+  }
+
+  async createOrder(data: Record<string, unknown>) {
+    return this.request<{ order: import('@/types').Order }>(
+      '/api/admin/orders',
+      { method: 'POST', body: JSON.stringify(data) }
+    );
+  }
+
+  async bulkImportOrders(orders: Record<string, unknown>[]) {
+    return this.request<{ message: string; created: number; skipped: number; errors: string[] }>(
+      '/api/admin/orders/bulk',
+      { method: 'POST', body: JSON.stringify({ orders }) }
+    );
+  }
+
+  async updateOrder(id: string, data: Record<string, unknown>) {
+    return this.request<{ order: import('@/types').Order }>(
+      `/api/admin/orders/${id}`,
+      { method: 'PUT', body: JSON.stringify(data) }
+    );
+  }
+
+  async deleteOrder(id: string) {
+    return this.request<{ message: string }>(
+      `/api/admin/orders/${id}`,
+      { method: 'DELETE' }
+    );
+  }
+
+  // ─── Hubs (NEW) ─────────────────────────────────
+
+  async getHubs() {
+    return this.request<{ hubs: import('@/types').Hub[]; total: number }>('/api/admin/hubs');
+  }
+
+  async createHub(data: Record<string, unknown>) {
+    return this.request<{ hub: import('@/types').Hub }>(
+      '/api/admin/hubs',
+      { method: 'POST', body: JSON.stringify(data) }
+    );
+  }
+
+  async updateHub(id: string, data: Record<string, unknown>) {
+    return this.request<{ hub: import('@/types').Hub }>(
+      `/api/admin/hubs/${id}`,
+      { method: 'PUT', body: JSON.stringify(data) }
+    );
+  }
+
+  async deleteHub(id: string) {
+    return this.request<{ message: string }>(
+      `/api/admin/hubs/${id}`,
+      { method: 'DELETE' }
+    );
+  }
+
+  // ─── Zones (NEW) ────────────────────────────────
+
+  async getZones() {
+    return this.request<{ zones: import('@/types').Zone[]; total: number }>('/api/admin/zones');
+  }
+
+  async createZone(data: Record<string, unknown>) {
+    return this.request<{ zone: import('@/types').Zone }>(
+      '/api/admin/zones',
+      { method: 'POST', body: JSON.stringify(data) }
+    );
+  }
+
+  async updateZone(id: string, data: Record<string, unknown>) {
+    return this.request<{ zone: import('@/types').Zone }>(
+      `/api/admin/zones/${id}`,
+      { method: 'PUT', body: JSON.stringify(data) }
+    );
+  }
+
+  async deleteZone(id: string) {
+    return this.request<{ message: string }>(
+      `/api/admin/zones/${id}`,
+      { method: 'DELETE' }
+    );
+  }
 }
 
 export const api = new ApiClient();

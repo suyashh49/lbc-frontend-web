@@ -6,6 +6,8 @@ export interface Rider {
   phone: string;
   hub: string;
   zone: string;
+  hubId?: string;
+  zoneId?: string;
   vehicleType: string;
   isActive: boolean;
   createdAt: string;
@@ -28,6 +30,7 @@ export interface Stop {
   _id: string;
   stopId: string;
   manifestId: string | { _id: string; manifestId: string };
+  orderId?: string;
   sequence: number;
   status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'rts' | 'reschedule';
   recipient: {
@@ -80,6 +83,13 @@ export interface DashboardStats {
     rts: number;
     reschedule: number;
   };
+  orders?: {
+    total: number;
+    available: number;
+    assigned: number;
+    delivered: number;
+    returned: number;
+  };
   deliveryRate: number;
   cod: { totalExpected: number; totalCollected: number };
   recentActivity: Stop[];
@@ -91,4 +101,51 @@ export interface AdminUser {
   name: string;
   email: string;
   role: string;
+}
+
+// ─── New types for Barcode Scan Manifest Flow ──────
+
+export interface Order {
+  _id: string;
+  trackingNumber: string;
+  stopId: string;
+  recipient: {
+    name: string;
+    phone: string;
+    field?: string;
+  };
+  address: {
+    text: string;
+    lat: number;
+    lng: number;
+    geocoded: boolean;
+  };
+  serviceType: string;
+  codAmount: number;
+  packageDetails: string;
+  specialInstructions: string;
+  hub: string;
+  zone: string;
+  status: 'available' | 'assigned' | 'delivered' | 'returned';
+  assignedManifestId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Hub {
+  _id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  radiusMeters: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Zone {
+  _id: string;
+  name: string;
+  hubIds: string[] | Hub[];
+  createdAt: string;
+  updatedAt: string;
 }
