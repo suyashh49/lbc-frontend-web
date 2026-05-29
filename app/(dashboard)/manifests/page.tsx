@@ -33,13 +33,15 @@ export default function ManifestsPage() {
 
   useEffect(() => { load(); }, [search, statusFilter]);
 
-  const getRiderName = (m: Manifest) => {
+  const getRiderName = (m: any) => {
+    if (m.rider?.name) return m.rider.name;
     if (typeof m.riderId === 'object' && m.riderId !== null) return (m.riderId as Rider).name;
     const r = riders.find(r => r.id === m.riderId);
     return r?.name || 'Unknown';
   };
 
-  const getRiderEmpId = (m: Manifest) => {
+  const getRiderEmpId = (m: any) => {
+    if (m.rider?.employeeId) return m.rider.employeeId;
     if (typeof m.riderId === 'object' && m.riderId !== null) return (m.riderId as Rider).employeeId;
     return '';
   };
@@ -57,7 +59,7 @@ export default function ManifestsPage() {
     setSaving(true);
     try {
       if (editManifest) {
-        await api.updateManifest(editManifest._id, { riderId: form.riderId, date: form.date });
+        await api.updateManifest((editManifest as any).id || editManifest._id, { riderId: form.riderId, date: form.date });
         showToast('Manifest updated');
       } else {
         await api.createManifest(form);
@@ -70,7 +72,7 @@ export default function ManifestsPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    try { await api.deleteManifest(deleteTarget._id); showToast('Manifest deleted'); setDeleteTarget(null); load(); }
+    try { await api.deleteManifest((deleteTarget as any).id || deleteTarget._id); showToast('Manifest deleted'); setDeleteTarget(null); load(); }
     catch { showToast('Failed to delete', 'error'); }
   };
 
@@ -98,9 +100,9 @@ export default function ManifestsPage() {
             <tbody>
               {loading ? [1,2,3].map(i => <tr key={i}><td colSpan={8}><div className="skeleton" style={{ height: 20 }} /></td></tr>)
               : manifests.length === 0 ? <tr><td colSpan={8}><div className="empty-state"><div className="empty-icon">📋</div><div className="empty-title">No manifests found</div></div></td></tr>
-              : manifests.map(m => (
-                <tr key={m._id}>
-                  <td><Link href={`/manifests/${m._id}`} style={{ color: 'var(--brand-red)', fontWeight: 600, textDecoration: 'none' }}>{m.manifestId}</Link></td>
+              : manifests.map((m: any) => (
+                <tr key={m.id || m._id}>
+                  <td><Link href={`/manifests/${m.id || m._id}`} style={{ color: 'var(--brand-red)', fontWeight: 600, textDecoration: 'none' }}>{m.manifestId}</Link></td>
                   <td>
                     <div>{getRiderName(m)}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{getRiderEmpId(m)}</div>
@@ -112,7 +114,7 @@ export default function ManifestsPage() {
                   <td style={{ color: 'var(--rose)' }}>{m.failedStops}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <Link href={`/manifests/${m._id}`} className="btn btn-ghost btn-sm">View</Link>
+                      <Link href={`/manifests/${m.id || m._id}`} className="btn btn-ghost btn-sm">View</Link>
                       <button className="btn btn-ghost btn-sm" onClick={() => openEdit(m)}>Edit</button>
                       <button className="btn btn-ghost btn-sm" style={{ color: 'var(--rose)' }} onClick={() => setDeleteTarget(m)}>Delete</button>
                     </div>

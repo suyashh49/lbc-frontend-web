@@ -26,26 +26,43 @@ export interface DeliveryResult {
 
 export interface Stop {
   _id: string;
+  id?: string;
   stopId: string;
-  manifestId: string | { _id: string; manifestId: string };
+  manifestId: string | { _id: string; id?: string; manifestId: string };
   orderId?: string;
   sequence: number;
   status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'rts' | 'reschedule';
-  recipient: {
+  recipient?: {
     name: string;
     phone: string;
   };
-  address: {
+  address?: {
     text: string;
     lat: number;
     lng: number;
     geocoded: boolean;
   };
-  trackingNumber: string;
-  serviceType: string;
-  codAmount: number;
-  packageDetails: string;
-  specialInstructions: string;
+  order?: {
+    id?: string;
+    trackingNumber?: string;
+    recipientName?: string;
+    recipientPhone?: string;
+    addressText?: string;
+    addressLat?: number;
+    addressLng?: number;
+    addressGeocoded?: boolean;
+    serviceType?: string;
+    codAmount?: number;
+    packageDetails?: string;
+    specialInstructions?: string;
+    status?: string;
+  };
+  manifest?: { id: string; manifestId: string; riderId?: string };
+  trackingNumber?: string;
+  serviceType?: string;
+  codAmount?: number;
+  packageDetails?: string;
+  specialInstructions?: string;
   distance: number;
   eta: string;
   attemptCount: number;
@@ -57,8 +74,10 @@ export interface Stop {
 
 export interface Manifest {
   _id: string;
+  id?: string;
   manifestId: string;
   riderId: string | Rider;
+  rider?: Rider;
   date: string;
   status: 'pending' | 'in_progress' | 'completed';
   totalStops: number;

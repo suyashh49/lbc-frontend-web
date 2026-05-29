@@ -148,12 +148,12 @@ export default function DashboardPage() {
             {stats.recentActivity.length === 0 ? (
               <div className="empty-state" style={{ padding: 32 }}><div className="empty-text">No recent activity</div></div>
             ) : (
-              stats.recentActivity.map(stop => (
-                <div key={stop._id} className="activity-item">
+              stats.recentActivity.map((stop: any) => (
+                <div key={stop.id || stop._id} className="activity-item">
                   <div className="activity-dot" style={{ background: STATUS_COLORS[stop.status] || 'var(--text-muted)' }} />
                   <div className="activity-info">
-                    <div className="activity-title">{stop.trackingNumber} — {stop.recipient.name}</div>
-                    <div className="activity-sub">{stop.address.text}</div>
+                    <div className="activity-title">{stop.order?.trackingNumber ?? stop.trackingNumber} — {stop.order?.recipientName ?? stop.recipient?.name ?? '—'}</div>
+                    <div className="activity-sub">{stop.order?.addressText ?? stop.address?.text ?? '—'}</div>
                   </div>
                   <span className={`badge badge-${stop.status}`}>{stop.status.replace('_', ' ')}</span>
                   <div className="activity-time">{new Date(stop.updatedAt).toLocaleTimeString()}</div>

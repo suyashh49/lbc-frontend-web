@@ -143,7 +143,7 @@ export default function OrdersPage() {
     reader.readAsText(file);
   };
 
-  const uniqueHubs = [...new Set(orders.map(o => o.hub))].filter(Boolean);
+  const uniqueHubs = [...new Set(orders.map((o: any) => typeof o.hub === 'object' ? o.hub?.name : o.hub))].filter(Boolean);
 
   return (
     <div className="page-container">
@@ -206,20 +206,20 @@ export default function OrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
+              {orders.map((order: any) => (
+                <tr key={order.id || order._id}>
                   <td><span className="tracking-number">{order.trackingNumber}</span></td>
                   <td>
-                    <div>{order.recipient.name}</div>
-                    <div className="text-muted">{order.recipient.phone}</div>
+                    <div>{order.recipientName ?? order.recipient?.name ?? '—'}</div>
+                    <div className="text-muted">{order.recipientPhone ?? order.recipient?.phone ?? ''}</div>
                   </td>
-                  <td><span className="text-truncate">{order.address.text}</span></td>
+                  <td><span className="text-truncate">{order.addressText ?? order.address?.text ?? '—'}</span></td>
                   <td>
-                    <div>{order.hub}</div>
-                    <div className="text-muted">{order.zone}</div>
+                    <div>{typeof order.hub === 'object' ? order.hub?.name : order.hub ?? '—'}</div>
+                    <div className="text-muted">{typeof order.hub === 'object' ? order.hub?.zone?.name : order.zone ?? ''}</div>
                   </td>
                   <td>{order.serviceType}</td>
-                  <td>{order.codAmount > 0 ? `₱${order.codAmount.toLocaleString()}` : '—'}</td>
+                  <td>{Number(order.codAmount) > 0 ? `₱${Number(order.codAmount).toLocaleString()}` : '—'}</td>
                   <td>
                     <span
                       className="status-badge"
@@ -233,7 +233,7 @@ export default function OrdersPage() {
                       <button className="btn-icon" onClick={() => setEditingOrder(order)} title="Edit">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                       </button>
-                      <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(order._id)} title="Delete">
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(order.id || order._id)} title="Delete">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                       </button>
                     </div>
@@ -252,7 +252,7 @@ export default function OrdersPage() {
       {(showCreateForm || editingOrder) && (
         <OrderFormModal
           order={editingOrder}
-          onSubmit={(data) => editingOrder ? handleUpdate(editingOrder._id, data) : handleCreate(data)}
+          onSubmit={(data) => editingOrder ? handleUpdate((editingOrder as any).id || editingOrder._id, data) : handleCreate(data)}
           onClose={() => { setShowCreateForm(false); setEditingOrder(null); }}
         />
       )}
@@ -294,19 +294,20 @@ function OrderFormModal({
   onSubmit: (data: Record<string, any>) => void;
   onClose: () => void;
 }) {
+  const o = order as any;
   const [form, setForm] = useState({
-    trackingNumber: order?.trackingNumber || '',
-    recipientName: order?.recipient?.name || '',
-    recipientPhone: order?.recipient?.phone || '',
-    addressText: order?.address?.text || '',
-    addressLat: order?.address?.lat?.toString() || '',
-    addressLng: order?.address?.lng?.toString() || '',
-    serviceType: order?.serviceType || 'Standard',
-    codAmount: order?.codAmount?.toString() || '0',
-    packageDetails: order?.packageDetails || '',
-    specialInstructions: order?.specialInstructions || '',
-    hub: order?.hub || '',
-    zone: order?.zone || '',
+    trackingNumber: o?.trackingNumber || '',
+    recipientName: o?.recipientName ?? o?.recipient?.name ?? '',
+    recipientPhone: o?.recipientPhone ?? o?.recipient?.phone ?? '',
+    addressText: o?.addressText ?? o?.address?.text ?? '',
+    addressLat: (o?.addressLat ?? o?.address?.lat)?.toString() || '',
+    addressLng: (o?.addressLng ?? o?.address?.lng)?.toString() || '',
+    serviceType: o?.serviceType || 'Standard',
+    codAmount: (o?.codAmount)?.toString() || '0',
+    packageDetails: o?.packageDetails || '',
+    specialInstructions: o?.specialInstructions || '',
+    hub: typeof o?.hub === 'object' ? o?.hub?.name ?? '' : o?.hub ?? '',
+    zone: typeof o?.hub === 'object' ? o?.hub?.zone?.name ?? '' : o?.zone ?? '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {

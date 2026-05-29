@@ -17,8 +17,8 @@ export default function ManifestDetailPage({ params }: { params: Promise<{ id: s
   if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '50vh' }}><span className="spinner" style={{ width: 32, height: 32 }} /></div>;
   if (!manifest) return <div className="empty-state"><div className="empty-icon">📋</div><div className="empty-title">Manifest not found</div></div>;
 
-  const rider = manifest.riderId as Rider;
-  const stops = (manifest.stops || []) as Stop[];
+  const rider = (manifest as any).rider || manifest.riderId as Rider;
+  const stops = (manifest.stops || []) as any[];
   const progress = manifest.totalStops > 0 ? Math.round(((manifest.completedStops + manifest.failedStops) / manifest.totalStops) * 100) : 0;
 
   return (
@@ -38,7 +38,7 @@ export default function ManifestDetailPage({ params }: { params: Promise<{ id: s
         <div className="card">
           <div className="detail-label">Assigned Rider</div>
           <div className="detail-value">{rider?.name || 'Unknown'}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{rider?.employeeId} · {rider?.hub}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{rider?.employeeId} · {typeof rider?.hub === 'object' ? rider?.hub?.name : rider?.hub ?? ''}</div>
         </div>
         <div className="card">
           <div className="detail-label">Date</div>
@@ -71,17 +71,17 @@ export default function ManifestDetailPage({ params }: { params: Promise<{ id: s
             <thead><tr><th>#</th><th>Tracking</th><th>Recipient</th><th>Address</th><th>Service</th><th>COD</th><th>Status</th></tr></thead>
             <tbody>
               {stops.length === 0 ? <tr><td colSpan={7}><div className="empty-state" style={{ padding: 32 }}><div className="empty-text">No stops in this manifest</div></div></td></tr>
-              : stops.map(s => (
-                <tr key={s._id}>
+              : stops.map((s: any) => (
+                <tr key={s.id || s._id}>
                   <td style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{s.sequence}</td>
-                  <td style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: 12 }}>{s.trackingNumber}</td>
+                  <td style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: 12 }}>{s.order?.trackingNumber ?? s.trackingNumber}</td>
                   <td>
-                    <div>{s.recipient.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.recipient.phone}</div>
+                    <div>{s.order?.recipientName ?? s.recipient?.name ?? '—'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.order?.recipientPhone ?? s.recipient?.phone ?? ''}</div>
                   </td>
-                  <td style={{ maxWidth: 220, fontSize: 12, color: 'var(--text-secondary)' }}>{s.address.text}</td>
-                  <td><span className="badge" style={{ background: 'var(--blue-dim)', color: 'var(--blue)' }}>{s.serviceType}</span></td>
-                  <td>{s.codAmount > 0 ? `₱${s.codAmount.toLocaleString()}` : '—'}</td>
+                  <td style={{ maxWidth: 220, fontSize: 12, color: 'var(--text-secondary)' }}>{s.order?.addressText ?? s.address?.text ?? '—'}</td>
+                  <td><span className="badge" style={{ background: 'var(--blue-dim)', color: 'var(--blue)' }}>{s.order?.serviceType ?? s.serviceType}</span></td>
+                  <td>{(s.order?.codAmount ?? s.codAmount ?? 0) > 0 ? `₱${(s.order?.codAmount ?? s.codAmount).toLocaleString()}` : '—'}</td>
                   <td><span className={`badge badge-${s.status}`}>{s.status.replace('_', ' ')}</span></td>
                 </tr>
               ))}

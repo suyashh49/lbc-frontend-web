@@ -46,27 +46,35 @@ export default function StopsPage() {
 
   // Render static map for selected stop
   useEffect(() => {
-    if (selectedStop && selectedStop.address.lat && selectedStop.address.lng && mapRef.current && GOOGLE_MAPS_KEY) {
-      const { lat, lng } = selectedStop.address;
+    const ss = selectedStop as any;
+    if (ss && (ss.order?.addressLat || ss.address?.lat) && (ss.order?.addressLng || ss.address?.lng) && mapRef.current && GOOGLE_MAPS_KEY) {
+      const lat = ss.order?.addressLat ?? ss.address?.lat;
+      const lng = ss.order?.addressLng ?? ss.address?.lng;
       mapRef.current.innerHTML = `<iframe width="100%" height="300" style="border:0;border-radius:14px" loading="lazy" src="https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_KEY}&q=${lat},${lng}&zoom=16"></iframe>`;
     }
   }, [selectedStop]);
 
-  const getManifestId = (s: Stop) => {
+  const getManifestId = (s: any) => {
+    if (s.manifest?.manifestId) return s.manifest.manifestId;
     if (typeof s.manifestId === 'object' && s.manifestId !== null) return (s.manifestId as { manifestId: string }).manifestId;
-    const m = manifests.find(m => m._id === s.manifestId);
+    const m = manifests.find((m: any) => (m.id || m._id) === s.manifestId);
     return m?.manifestId || s.manifestId;
   };
 
   const openCreate = () => { setEditStop(null); setForm(EMPTY_FORM); setShowModal(true); };
-  const openEdit = (s: Stop) => {
+  const openEdit = (s: any) => {
     setEditStop(s);
-    const mid = typeof s.manifestId === 'object' ? (s.manifestId as { _id: string })._id : s.manifestId;
+    const mid = s.manifest?.id || (typeof s.manifestId === 'object' ? s.manifestId?.id || s.manifestId?._id : s.manifestId);
+    const o = s.order || {};
     setForm({
-      stopId: s.stopId, manifestId: mid, trackingNumber: s.trackingNumber, serviceType: s.serviceType,
-      recipientName: s.recipient.name, recipientPhone: s.recipient.phone, addressText: s.address.text,
-      addressLat: s.address.lat, addressLng: s.address.lng, addressGeocoded: s.address.geocoded,
-      codAmount: String(s.codAmount), packageDetails: s.packageDetails, specialInstructions: s.specialInstructions,
+      stopId: s.stopId, manifestId: mid, trackingNumber: o.trackingNumber ?? s.trackingNumber ?? '',
+      serviceType: o.serviceType ?? s.serviceType ?? 'Express Padala',
+      recipientName: o.recipientName ?? s.recipient?.name ?? '', recipientPhone: o.recipientPhone ?? s.recipient?.phone ?? '',
+      addressText: o.addressText ?? s.address?.text ?? '',
+      addressLat: o.addressLat ?? s.address?.lat ?? 0, addressLng: o.addressLng ?? s.address?.lng ?? 0,
+      addressGeocoded: o.addressGeocoded ?? s.address?.geocoded ?? false,
+      codAmount: String(o.codAmount ?? s.codAmount ?? 0), packageDetails: o.packageDetails ?? s.packageDetails ?? '',
+      specialInstructions: o.specialInstructions ?? s.specialInstructions ?? '',
     });
     setShowModal(true);
   };
@@ -83,7 +91,7 @@ export default function StopsPage() {
         address: { text: form.addressText, lat: form.addressLat, lng: form.addressLng, geocoded: form.addressGeocoded },
       };
       if (editStop) {
-        await api.updateStop(editStop._id, payload);
+        await api.updateStop((editStop as any).id || editStop._id, payload);
         showToast('Stop updated (geocoded automatically)');
       } else {
         await api.createStop(payload);
@@ -96,13 +104,13 @@ export default function StopsPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    try { await api.deleteStop(deleteTarget._id); showToast('Stop deleted'); setDeleteTarget(null); load(); }
+    try { await api.deleteStop((deleteTarget as any).id || deleteTarget._id); showToast('Stop deleted'); setDeleteTarget(null); load(); }
     catch { showToast('Failed to delete', 'error'); }
   };
 
   const updateStatus = async (stop: Stop, newStatus: string) => {
     try {
-      await api.updateStop(stop._id, { status: newStatus });
+      await api.updateStop((stop as any).id || stop._id, { status: newStatus });
       showToast(`Status updated to ${newStatus}`);
       load();
     } catch { showToast('Failed to update status', 'error'); }
@@ -121,8 +129,8 @@ export default function StopsPage() {
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid var(--border-color)' }}>
               <div>
-                <span style={{ fontWeight: 600 }}>{selectedStop.recipient.name}</span>
-                <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: 12 }}>{selectedStop.address.text}</span>
+                <span style={{ fontWeight: 600 }}>{(selectedStop as any).order?.recipientName ?? (selectedStop as any).recipient?.name ?? '—'}</span>
+                <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: 12 }}>{(selectedStop as any).order?.addressText ?? (selectedStop as any).address?.text ?? '—'}</span>
               </div>
               <button className="btn btn-ghost btn-sm" onClick={() => setSelectedStop(null)}>✕ Close</button>
             </div>
@@ -142,7 +150,7 @@ export default function StopsPage() {
           </select>
           <select className="filter-select" value={manifestFilter} onChange={e => setManifestFilter(e.target.value)}>
             <option value="">All Manifests</option>
-            {manifests.map(m => <option key={m._id} value={m._id}>{m.manifestId}</option>)}
+            {manifests.map((m: any) => <option key={m.id || m._id} value={m.id || m._id}>{m.manifestId}</option>)}
           </select>
         </div>
 
@@ -152,21 +160,21 @@ export default function StopsPage() {
             <tbody>
               {loading ? [1,2,3].map(i => <tr key={i}><td colSpan={9}><div className="skeleton" style={{ height: 20 }} /></td></tr>)
               : stops.length === 0 ? <tr><td colSpan={9}><div className="empty-state"><div className="empty-icon">📍</div><div className="empty-title">No stops found</div></div></td></tr>
-              : stops.map(s => (
-                <tr key={s._id} style={{ cursor: 'pointer' }} onClick={() => setSelectedStop(s)}>
+              : stops.map((s: any) => (
+                <tr key={s.id || s._id} style={{ cursor: 'pointer' }} onClick={() => setSelectedStop(s)}>
                   <td style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{s.sequence}</td>
-                  <td style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 600 }}>{s.trackingNumber}</td>
+                  <td style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 600 }}>{s.order?.trackingNumber ?? s.trackingNumber}</td>
                   <td><span className="badge" style={{ background: 'var(--purple-dim)', color: 'var(--purple)' }}>{getManifestId(s)}</span></td>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{s.recipient.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.recipient.phone}</div>
+                    <div style={{ fontWeight: 500 }}>{s.order?.recipientName ?? s.recipient?.name ?? '—'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.order?.recipientPhone ?? s.recipient?.phone ?? ''}</div>
                   </td>
                   <td style={{ maxWidth: 200, fontSize: 12, color: 'var(--text-secondary)' }}>
-                    {s.address.text}
-                    {s.address.geocoded && <span style={{ color: 'var(--green)', marginLeft: 4, fontSize: 10 }}>✓ geocoded</span>}
+                    {s.order?.addressText ?? s.address?.text ?? '—'}
+                    {(s.order?.addressGeocoded ?? s.address?.geocoded) && <span style={{ color: 'var(--green)', marginLeft: 4, fontSize: 10 }}>✓ geocoded</span>}
                   </td>
-                  <td><span className="badge" style={{ background: 'var(--blue-dim)', color: 'var(--blue)' }}>{s.serviceType}</span></td>
-                  <td>{s.codAmount > 0 ? `₱${s.codAmount.toLocaleString()}` : '—'}</td>
+                  <td><span className="badge" style={{ background: 'var(--blue-dim)', color: 'var(--blue)' }}>{s.order?.serviceType ?? s.serviceType}</span></td>
+                  <td>{(s.order?.codAmount ?? s.codAmount ?? 0) > 0 ? `₱${(s.order?.codAmount ?? s.codAmount).toLocaleString()}` : '—'}</td>
                   <td>
                     <select className="filter-select" value={s.status} onChange={(e) => { e.stopPropagation(); updateStatus(s, e.target.value); }} onClick={e => e.stopPropagation()} style={{ fontSize: 11, padding: '4px 24px 4px 8px', minWidth: 110 }}>
                       <option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="rts">RTS</option><option value="reschedule">Rescheduled</option>
@@ -195,7 +203,7 @@ export default function StopsPage() {
               <div className="form-group"><label className="form-label">Manifest</label>
                 <select className="form-select" value={form.manifestId} onChange={e => setForm(f => ({...f, manifestId: e.target.value}))} required disabled={!!editStop}>
                   <option value="">Select manifest...</option>
-                  {manifests.map(m => <option key={m._id} value={m._id}>{m.manifestId}</option>)}
+                  {manifests.map((m: any) => <option key={m.id || m._id} value={m.id || m._id}>{m.manifestId}</option>)}
                 </select>
               </div>
             </div>
