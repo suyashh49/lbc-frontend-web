@@ -1,13 +1,11 @@
 export interface Rider {
-  _id: string;
+  id: string;
   employeeId: string;
   name: string;
   email: string;
   phone: string;
-  hub: string;
-  zone: string;
-  hubId?: string;
-  zoneId?: string;
+  hubId: string;
+  hub?: { id: string; name: string; zone?: { id: string; name: string } };
   vehicleType: string;
   isActive: boolean;
   createdAt: string;
@@ -133,7 +131,7 @@ export interface Order {
 }
 
 export interface Hub {
-  _id: string;
+  id: string;
   name: string;
   lat: number;
   lng: number;
@@ -143,7 +141,7 @@ export interface Hub {
 }
 
 export interface Zone {
-  _id: string;
+  id: string;
   name: string;
   hubIds: string[] | Hub[];
   createdAt: string;

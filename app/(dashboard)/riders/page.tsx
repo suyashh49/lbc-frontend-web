@@ -2,15 +2,16 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { api } from '@/lib/api';
-import { Rider } from '@/types';
+import { Rider, Hub } from '@/types';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
-const EMPTY_FORM = { employeeId: '', name: '', email: '', phone: '', password: '', hub: '', zone: '', vehicleType: 'motorcycle' };
+const EMPTY_FORM = { employeeId: '', name: '', email: '', phone: '', password: '', hubId: '', vehicleType: 'motorcycle' };
 
 export default function RidersPage() {
   const [riders, setRiders] = useState<Rider[]>([]);
+  const [hubs, setHubs] = useState<Hub[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -27,11 +28,12 @@ export default function RidersPage() {
   };
 
   useEffect(() => { load(); }, [search, statusFilter]);
+  useEffect(() => { api.getHubs().then(d => setHubs(d.hubs)).catch(() => {}); }, []);
 
   const openCreate = () => { setEditRider(null); setForm(EMPTY_FORM); setShowModal(true); };
   const openEdit = (r: Rider) => {
     setEditRider(r);
-    setForm({ employeeId: r.employeeId, name: r.name, email: r.email, phone: r.phone, password: '', hub: r.hub, zone: r.zone, vehicleType: r.vehicleType });
+    setForm({ employeeId: r.employeeId, name: r.name, email: r.email, phone: r.phone, password: '', hubId: r.hubId ?? '', vehicleType: r.vehicleType });
     setShowModal(true);
   };
 
@@ -42,7 +44,7 @@ export default function RidersPage() {
       if (editRider) {
         const data: Record<string, unknown> = { ...form };
         if (!form.password) delete data.password;
-        await api.updateRider(editRider._id, data);
+        await api.updateRider(editRider.id, data);
         showToast('Rider updated');
       } else {
         await api.createRider(form);
@@ -58,7 +60,7 @@ export default function RidersPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await api.deleteRider(deleteTarget._id);
+      await api.deleteRider(deleteTarget.id);
       showToast('Rider deactivated');
       setDeleteTarget(null);
       load();
@@ -67,7 +69,7 @@ export default function RidersPage() {
 
   const toggleActive = async (r: Rider) => {
     try {
-      await api.updateRider(r._id, { isActive: !r.isActive });
+      await api.updateRider(r.id, { isActive: !r.isActive });
       showToast(r.isActive ? 'Rider deactivated' : 'Rider activated');
       load();
     } catch { showToast('Failed to update status', 'error'); }
@@ -98,7 +100,7 @@ export default function RidersPage() {
         <div className="table-wrap">
           <table>
             <thead><tr>
-              <th>Employee ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Hub</th><th>Zone</th><th>Vehicle</th><th>Status</th><th>Actions</th>
+              <th>Employee ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Hub</th><th>Zone</th><th>Vehicle</th><th>Status</th><th style={{ width: 120 }}>Actions</th>
             </tr></thead>
             <tbody>
               {loading ? (
@@ -106,13 +108,13 @@ export default function RidersPage() {
               ) : riders.length === 0 ? (
                 <tr><td colSpan={9}><div className="empty-state"><div className="empty-icon">👥</div><div className="empty-title">No riders found</div></div></td></tr>
               ) : riders.map(r => (
-                <tr key={r._id}>
+                <tr key={r.id}>
                   <td style={{ fontWeight: 600 }}>{r.employeeId}</td>
                   <td>{r.name}</td>
                   <td style={{ color: 'var(--text-secondary)' }}>{r.email}</td>
                   <td>{r.phone}</td>
-                  <td>{r.hub}</td>
-                  <td style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{r.zone}</td>
+                  <td>{r.hub?.name ?? '—'}</td>
+                  <td style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{r.hub?.zone?.name ?? '—'}</td>
                   <td><span className="badge" style={{ background: 'var(--blue-dim)', color: 'var(--blue)' }}>{r.vehicleType}</span></td>
                   <td>
                     <button className={`badge badge-${r.isActive ? 'active' : 'inactive'}`} onClick={() => toggleActive(r)} style={{ cursor: 'pointer', border: 'none' }}>
@@ -146,9 +148,12 @@ export default function RidersPage() {
               <div className="form-group"><label className="form-label">Phone</label><input className="form-input" value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} required /></div>
             </div>
             <div className="form-group"><label className="form-label">Password {editRider && '(leave blank to keep)'}</label><input className="form-input" type="password" value={form.password} onChange={e => setForm(f => ({...f, password: e.target.value}))} required={!editRider} /></div>
-            <div className="form-row">
-              <div className="form-group"><label className="form-label">Hub</label><input className="form-input" value={form.hub} onChange={e => setForm(f => ({...f, hub: e.target.value}))} required /></div>
-              <div className="form-group"><label className="form-label">Zone</label><input className="form-input" value={form.zone} onChange={e => setForm(f => ({...f, zone: e.target.value}))} required /></div>
+            <div className="form-group">
+              <label className="form-label">Hub</label>
+              <select className="form-select" value={form.hubId} onChange={e => setForm(f => ({...f, hubId: e.target.value}))} required>
+                <option value="">Select a hub</option>
+                {hubs.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+              </select>
             </div>
             <div className="form-group"><label className="form-label">Vehicle Type</label>
               <select className="form-select" value={form.vehicleType} onChange={e => setForm(f => ({...f, vehicleType: e.target.value}))}>

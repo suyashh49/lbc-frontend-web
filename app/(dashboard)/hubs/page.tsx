@@ -150,7 +150,7 @@ export default function HubsPage() {
             </thead>
             <tbody>
               {hubs.map((hub) => (
-                <tr key={hub._id}>
+                <tr key={hub.id}>
                   <td><strong>{hub.name}</strong></td>
                   <td>{hub.lat.toFixed(6)}</td>
                   <td>{hub.lng.toFixed(6)}</td>
@@ -160,7 +160,7 @@ export default function HubsPage() {
                       <button className="btn-icon" onClick={() => setEditingHub(hub)} title="Edit">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                       </button>
-                      <button className="btn-icon btn-icon-danger" onClick={() => handleDeleteHub(hub._id)} title="Delete">
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDeleteHub(hub.id)} title="Delete">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                       </button>
                     </div>
@@ -186,7 +186,7 @@ export default function HubsPage() {
             </thead>
             <tbody>
               {zones.map((zone) => (
-                <tr key={zone._id}>
+                <tr key={zone.id}>
                   <td><strong>{zone.name}</strong></td>
                   <td>
                     {Array.isArray(zone.hubIds) && zone.hubIds.length > 0
@@ -198,7 +198,7 @@ export default function HubsPage() {
                       <button className="btn-icon" onClick={() => setEditingZone(zone)} title="Edit">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                       </button>
-                      <button className="btn-icon btn-icon-danger" onClick={() => handleDeleteZone(zone._id)} title="Delete">
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDeleteZone(zone.id)} title="Delete">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                       </button>
                     </div>
@@ -217,7 +217,7 @@ export default function HubsPage() {
       {(showHubForm || editingHub) && (
         <HubFormModal
           hub={editingHub}
-          onSubmit={(data) => editingHub ? handleUpdateHub(editingHub._id, data) : handleCreateHub(data)}
+          onSubmit={(data) => editingHub ? handleUpdateHub(editingHub.id, data) : handleCreateHub(data)}
           onClose={() => { setShowHubForm(false); setEditingHub(null); }}
         />
       )}
@@ -227,7 +227,7 @@ export default function HubsPage() {
         <ZoneFormModal
           zone={editingZone}
           hubs={hubs}
-          onSubmit={(data) => editingZone ? handleUpdateZone(editingZone._id, data) : handleCreateZone(data)}
+          onSubmit={(data) => editingZone ? handleUpdateZone(editingZone.id, data) : handleCreateZone(data)}
           onClose={() => { setShowZoneForm(false); setEditingZone(null); }}
         />
       )}
@@ -306,7 +306,7 @@ function ZoneFormModal({
   onClose: () => void;
 }) {
   const existingHubIds = zone?.hubIds
-    ? (zone.hubIds as any[]).map((h: any) => typeof h === 'string' ? h : h._id)
+    ? (zone.hubIds as any[]).map((h: any) => typeof h === 'string' ? h : h.id)
     : [];
 
   const [form, setForm] = useState({
@@ -342,11 +342,11 @@ function ZoneFormModal({
               <label>Associated Hubs</label>
               <div className="checkbox-list">
                 {hubs.length > 0 ? hubs.map(hub => (
-                  <label key={hub._id} className="checkbox-item">
+                  <label key={hub.id} className="checkbox-item">
                     <input
                       type="checkbox"
-                      checked={form.hubIds.includes(hub._id)}
-                      onChange={() => toggleHub(hub._id)}
+                      checked={form.hubIds.includes(hub.id)}
+                      onChange={() => toggleHub(hub.id)}
                     />
                     {hub.name}
                   </label>

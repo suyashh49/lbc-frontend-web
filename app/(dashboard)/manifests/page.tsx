@@ -35,7 +35,7 @@ export default function ManifestsPage() {
 
   const getRiderName = (m: Manifest) => {
     if (typeof m.riderId === 'object' && m.riderId !== null) return (m.riderId as Rider).name;
-    const r = riders.find(r => r._id === m.riderId);
+    const r = riders.find(r => r.id === m.riderId);
     return r?.name || 'Unknown';
   };
 
@@ -47,7 +47,7 @@ export default function ManifestsPage() {
   const openCreate = () => { setEditManifest(null); setForm({ manifestId: '', riderId: '', date: new Date().toISOString().split('T')[0] }); setShowModal(true); };
   const openEdit = (m: Manifest) => {
     setEditManifest(m);
-    const rid = typeof m.riderId === 'object' ? (m.riderId as Rider)._id : m.riderId;
+    const rid = typeof m.riderId === 'object' ? (m.riderId as Rider).id : m.riderId;
     setForm({ manifestId: m.manifestId, riderId: rid, date: m.date.split('T')[0] });
     setShowModal(true);
   };
@@ -133,7 +133,7 @@ export default function ManifestsPage() {
             <div className="form-group"><label className="form-label">Assign Rider</label>
               <select className="form-select" value={form.riderId} onChange={e => setForm(f => ({...f, riderId: e.target.value}))} required>
                 <option value="">Select rider...</option>
-                {riders.filter(r => r.isActive).map(r => <option key={r._id} value={r._id}>{r.name} ({r.employeeId})</option>)}
+                {riders.filter(r => r.isActive).map(r => <option key={r.id} value={r.id}>{r.name} ({r.employeeId})</option>)}
               </select>
             </div>
             <div className="form-group"><label className="form-label">Date</label><input className="form-input" type="date" value={form.date} onChange={e => setForm(f => ({...f, date: e.target.value}))} required /></div>
