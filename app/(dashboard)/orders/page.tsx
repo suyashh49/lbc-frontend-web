@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import type { Order } from '@/types';
+import { useBrand } from '@/brand/BrandProvider';
 
 const STATUS_COLORS: Record<string, string> = {
-  available: 'var(--color-purple, #7c3aed)',
-  assigned: 'var(--color-info, #3b82f6)',
-  delivered: 'var(--color-success, #22c55e)',
-  returned: 'var(--color-warning, #f59e0b)',
+  available: 'var(--purple)',
+  assigned: 'var(--blue)',
+  delivered: 'var(--green)',
+  returned: 'var(--amber)',
 };
 
 export default function OrdersPage() {
@@ -294,6 +295,7 @@ function OrderFormModal({
   onSubmit: (data: Record<string, any>) => void;
   onClose: () => void;
 }) {
+  const { brand } = useBrand();
   const o = order as any;
   const [form, setForm] = useState({
     trackingNumber: o?.trackingNumber || '',
@@ -343,7 +345,7 @@ function OrderFormModal({
                 onChange={e => setForm(p => ({ ...p, trackingNumber: e.target.value }))}
                 required
                 disabled={!!order}
-                placeholder="LBC-2025-XXXX"
+                placeholder={brand.copy.trackingPlaceholder}
               />
             </div>
             <div className="form-group">

@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useBrand } from '@/brand/BrandProvider';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login, user } = useAuth();
+  const { brand } = useBrand();
 
   if (user) {
     router.replace('/dashboard');
@@ -37,9 +39,9 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-logo">
-          <div className="login-logo-icon">LBC</div>
-          <h1 className="login-title">LBC Express</h1>
-          <p className="login-sub">Operations Admin Panel</p>
+          <div className="login-logo-icon">{brand.copy.shortName}</div>
+          <h1 className="login-title">{brand.copy.companyName}</h1>
+          <p className="login-sub">{brand.copy.loginSubtitle}</p>
         </div>
 
         {error && <div className="login-error">{error}</div>}
@@ -53,7 +55,7 @@ export default function LoginPage() {
               className="form-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@lbc.ph"
+              placeholder={brand.copy.loginEmailHint}
               required
             />
           </div>
@@ -79,9 +81,11 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginTop: 20 }}>
-          Demo: admin@lbc.ph / admin123
-        </p>
+        {brand.copy.demoCredentials && (
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginTop: 20 }}>
+            {brand.copy.demoCredentials}
+          </p>
+        )}
       </div>
     </div>
   );

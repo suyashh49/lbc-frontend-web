@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Body font is loaded via next/font (see app/layout.tsx) and exposed as
+   --font-body; brand color tokens are injected from the active Brand object. */
 
 :root {
   --bg-primary: #0a0a0f;
@@ -11,9 +12,12 @@
   --text-primary: #f0f0f5;
   --text-secondary: #8b8b9e;
   --text-muted: #5a5a6e;
-  --brand-red: #d32f2f;
-  --brand-red-dim: rgba(211,47,47,0.15);
-  --brand-red-glow: rgba(211,47,47,0.3);
+  /* Brand primary (overridable per white-label, default = LBC). --brand-red is
+     kept as an alias so existing rules keep working; dim/glow derive from it. */
+  --brand-primary: #d32f2f;
+  --brand-red: var(--brand-primary);
+  --brand-red-dim: color-mix(in srgb, var(--brand-primary) 15%, transparent);
+  --brand-red-glow: color-mix(in srgb, var(--brand-primary) 30%, transparent);
   --green: #22c55e;
   --green-dim: rgba(34,197,94,0.15);
   --amber: #f59e0b;
@@ -24,12 +28,14 @@
   --blue-dim: rgba(59,130,246,0.15);
   --rose: #f43f5e;
   --rose-dim: rgba(244,63,94,0.15);
+  --reschedule: #ff9800;
+  --reschedule-dim: rgba(255,152,0,0.15);
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
-  --shadow-glow: 0 0 40px rgba(211,47,47,0.08);
+  --shadow-glow: 0 0 40px color-mix(in srgb, var(--brand-primary) 8%, transparent);
   --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
 }
 
@@ -45,9 +51,8 @@
   --text-primary: #1a1a2e;
   --text-secondary: #5a5a72;
   --text-muted: #8b8ba0;
-  --brand-red: #c62828;
-  --brand-red-dim: rgba(198,40,40,0.1);
-  --brand-red-glow: rgba(198,40,40,0.15);
+  /* Light-theme brand primary (overridden per brand); dim/glow derive from it. */
+  --brand-primary: #c62828;
   --green: #16a34a;
   --green-dim: rgba(22,163,74,0.1);
   --amber: #d97706;
@@ -59,13 +64,12 @@
   --rose: #e11d48;
   --rose-dim: rgba(225,29,72,0.1);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
-  --shadow-glow: 0 0 40px rgba(198,40,40,0.05);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: var(--font-body), 'Inter', -apple-system, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
@@ -158,7 +162,7 @@ body {
   transition: all var(--transition); font-family: inherit; text-decoration: none;
 }
 .btn-primary { background: var(--brand-red); color: #fff; }
-.btn-primary:hover { background: #b71c1c; box-shadow: 0 4px 16px var(--brand-red-glow); }
+.btn-primary:hover { background: color-mix(in srgb, var(--brand-primary) 82%, #000); box-shadow: 0 4px 16px var(--brand-red-glow); }
 .btn-secondary { background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary); }
 .btn-secondary:hover { background: var(--bg-card-hover); border-color: var(--border-active); }
 .btn-ghost { background: transparent; color: var(--text-secondary); }
@@ -266,8 +270,8 @@ tbody td { padding: 14px 16px; font-size: 13px; vertical-align: middle; }
   box-shadow: var(--shadow-lg); animation: slideRight 0.3s ease; min-width: 280px;
   display: flex; align-items: center; gap: 10px;
 }
-.toast-success { background: #166534; color: #bbf7d0; border: 1px solid rgba(34,197,94,0.3); }
-.toast-error { background: #991b1b; color: #fecaca; border: 1px solid rgba(244,63,94,0.3); }
+.toast-success { background: color-mix(in srgb, var(--green) 45%, #000); color: #bbf7d0; border: 1px solid color-mix(in srgb, var(--green) 30%, transparent); }
+.toast-error { background: color-mix(in srgb, var(--rose) 45%, #000); color: #fecaca; border: 1px solid color-mix(in srgb, var(--rose) 30%, transparent); }
 
 /* ── Loading ── */
 .skeleton {
