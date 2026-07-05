@@ -2,17 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
-import type { Order } from '@/types';
+import type { Order, Hub } from '@/types';
+import { useBrand } from '@/brand/BrandProvider';
 
 const STATUS_COLORS: Record<string, string> = {
-  available: 'var(--color-purple, #7c3aed)',
-  assigned: 'var(--color-info, #3b82f6)',
-  delivered: 'var(--color-success, #22c55e)',
-  returned: 'var(--color-warning, #f59e0b)',
+  available: 'var(--purple)',
+  assigned: 'var(--blue)',
+  delivered: 'var(--green)',
+  returned: 'var(--amber)',
 };
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [hubs, setHubs] = useState<Hub[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -43,6 +45,10 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchOrders();
   }, [search, statusFilter, hubFilter]);
+
+  useEffect(() => {
+    api.getHubs().then(d => setHubs(d.hubs)).catch(() => {});
+  }, []);
 
   const handleCreate = async (formData: Record<string, any>) => {
     try {
@@ -143,8 +149,6 @@ export default function OrdersPage() {
     reader.readAsText(file);
   };
 
-  const uniqueHubs = [...new Set(orders.map((o: any) => typeof o.hub === 'object' ? o.hub?.name : o.hub))].filter(Boolean);
-
   return (
     <div className="page-container">
       <div className="page-header">
@@ -168,12 +172,16 @@ export default function OrdersPage() {
 
       {/* Filters */}
       <div className="filters-row">
-        <input
-          className="filter-input"
-          placeholder="Search tracking #, recipient, address..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="search-wrapper" style={{ flex: 1, minWidth: 280 }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input
+            className="search-input"
+            style={{ width: '100%' }}
+            placeholder="Search tracking #, recipient, address..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">All Statuses</option>
           <option value="available">Available</option>
@@ -183,7 +191,7 @@ export default function OrdersPage() {
         </select>
         <select className="filter-select" value={hubFilter} onChange={(e) => setHubFilter(e.target.value)}>
           <option value="">All Hubs</option>
-          {uniqueHubs.map(h => <option key={h} value={h}>{h}</option>)}
+          {hubs.map(h => <option key={h.id} value={h.name}>{h.name}</option>)}
         </select>
       </div>
 
@@ -294,6 +302,7 @@ function OrderFormModal({
   onSubmit: (data: Record<string, any>) => void;
   onClose: () => void;
 }) {
+  const { brand } = useBrand();
   const o = order as any;
   const [form, setForm] = useState({
     trackingNumber: o?.trackingNumber || '',
@@ -343,7 +352,7 @@ function OrderFormModal({
                 onChange={e => setForm(p => ({ ...p, trackingNumber: e.target.value }))}
                 required
                 disabled={!!order}
-                placeholder="LBC-2025-XXXX"
+                placeholder={brand.copy.trackingPlaceholder}
               />
             </div>
             <div className="form-group">

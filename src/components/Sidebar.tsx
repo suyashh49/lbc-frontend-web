@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
+import { useBrand } from '@/brand/BrandProvider';
+import { BrandSwitcher } from '@/brand/BrandSwitcher';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/dashboard', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
@@ -18,15 +20,16 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { brand } = useBrand();
 
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">LBC</div>
+          <div className="sidebar-logo-icon">{brand.copy.shortName}</div>
           <div>
-            <div className="sidebar-logo-text">LBC Express</div>
-            <div className="sidebar-logo-sub">Admin Panel</div>
+            <div className="sidebar-logo-text">{brand.copy.companyName}</div>
+            <div className="sidebar-logo-sub">{brand.copy.panelLabel}</div>
           </div>
         </div>
       </div>
@@ -61,6 +64,7 @@ export default function Sidebar() {
             <div className="theme-toggle-thumb" />
           </div>
         </button>
+        <BrandSwitcher />
         <button className="logout-btn" onClick={logout}>Sign Out</button>
       </div>
     </aside>

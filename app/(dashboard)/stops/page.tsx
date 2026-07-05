@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import Modal from '@/components/Modal';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useBrand } from '@/brand/BrandProvider';
 
 const EMPTY_FORM = {
   stopId: '', manifestId: '', trackingNumber: '', serviceType: 'Express Padala',
@@ -17,6 +18,7 @@ const EMPTY_FORM = {
 const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 export default function StopsPage() {
+  const { brand } = useBrand();
   const [stops, setStops] = useState<Stop[]>([]);
   const [manifests, setManifests] = useState<Manifest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -208,7 +210,7 @@ export default function StopsPage() {
               </div>
             </div>
             <div className="form-row">
-              <div className="form-group"><label className="form-label">Tracking Number</label><input className="form-input" value={form.trackingNumber} onChange={e => setForm(f => ({...f, trackingNumber: e.target.value}))} required placeholder="LBC-XXX-XXXX" /></div>
+              <div className="form-group"><label className="form-label">Tracking Number</label><input className="form-input" value={form.trackingNumber} onChange={e => setForm(f => ({...f, trackingNumber: e.target.value}))} required placeholder={brand.copy.trackingPlaceholder} /></div>
               <div className="form-group"><label className="form-label">Service Type</label>
                 <select className="form-select" value={form.serviceType} onChange={e => setForm(f => ({...f, serviceType: e.target.value}))}>
                   <option value="Express Padala">Express Padala</option><option value="Standard">Standard</option><option value="Same Day">Same Day</option>
