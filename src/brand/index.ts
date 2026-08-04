@@ -2,6 +2,7 @@ import type { Brand } from './types';
 import { lbcBrand } from './brands/lbc';
 import { acmeBrand } from './brands/acme';
 import { fedexBrand } from './brands/fedex';
+import { quadxBrand } from './brands/quadx';
 
 export type { Brand } from './types';
 
@@ -10,6 +11,7 @@ export const BRANDS: Record<string, Brand> = {
   lbc: lbcBrand,
   acme: acmeBrand,
   fedex: fedexBrand,
+  quadx: quadxBrand,
 };
 
 export const DEFAULT_BRAND = lbcBrand;

@@ -26,9 +26,14 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">{brand.copy.shortName}</div>
+          {brand.identity.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={brand.identity.logoUrl} alt={brand.copy.companyName} className="sidebar-logo-img" />
+          ) : (
+            <div className="sidebar-logo-icon">{brand.copy.shortName}</div>
+          )}
           <div>
-            <div className="sidebar-logo-text">{brand.copy.companyName}</div>
+            {!brand.identity.logoUrl && <div className="sidebar-logo-text">{brand.copy.companyName}</div>}
             <div className="sidebar-logo-sub">{brand.copy.panelLabel}</div>
           </div>
         </div>

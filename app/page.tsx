@@ -39,7 +39,12 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-logo">
-          <div className="login-logo-icon">{brand.copy.shortName}</div>
+          {brand.identity.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={brand.identity.logoUrl} alt={brand.copy.companyName} className="login-logo-img" />
+          ) : (
+            <div className="login-logo-icon">{brand.copy.shortName}</div>
+          )}
           <h1 className="login-title">{brand.copy.companyName}</h1>
           <p className="login-sub">{brand.copy.loginSubtitle}</p>
         </div>
