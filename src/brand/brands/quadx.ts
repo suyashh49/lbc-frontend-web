@@ -30,6 +30,9 @@ export const quadxBrand: Brand = {
   },
   font: { family: 'Inter' },
   identity: {
+    /** Dark wordmark — readable on light surfaces. */
     logoUrl: '/brands/quadx/logo.png',
+    /** Light wordmark — readable on dark surfaces (default admin theme). */
+    logoDarkUrl: '/brands/quadx/logo-dark.png',
   },
 };

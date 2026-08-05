@@ -26,3 +26,18 @@ export function getBrand(key?: string): Brand {
   const resolved = (key ?? process.env.NEXT_PUBLIC_BRAND ?? '').toLowerCase();
   return BRANDS[resolved] ?? DEFAULT_BRAND;
 }
+
+/**
+ * Picks the logo asset that contrasts with the current theme surface.
+ * Dark theme → `logoDarkUrl` (when present), else `logoUrl`.
+ * Light theme → `logoUrl`.
+ */
+export function resolveBrandLogoUrl(
+  brand: Brand,
+  theme: 'dark' | 'light' = 'dark',
+): string | undefined {
+  if (theme === 'dark' && brand.identity.logoDarkUrl) {
+    return brand.identity.logoDarkUrl;
+  }
+  return brand.identity.logoUrl;
+}

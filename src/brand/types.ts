@@ -51,8 +51,13 @@ export interface BrandFont {
 }
 
 export interface BrandIdentity {
-  /** Optional logo image URL (falls back to the text monogram). */
+  /** Optional logo image URL for light backgrounds (falls back to the text monogram). */
   logoUrl?: string;
+  /**
+   * Optional logo for dark backgrounds. When set, used in dark theme;
+   * otherwise `logoUrl` is used in both themes.
+   */
+  logoDarkUrl?: string;
   /** Optional favicon URL. */
   faviconUrl?: string;
 }

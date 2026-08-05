@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useBrand } from '@/brand/BrandProvider';
+import { useTheme } from '@/lib/theme';
+import { resolveBrandLogoUrl } from '@/brand';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,6 +16,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, user } = useAuth();
   const { brand } = useBrand();
+  const { theme } = useTheme();
+  const logoUrl = resolveBrandLogoUrl(brand, theme);
 
   if (user) {
     router.replace('/dashboard');
@@ -39,9 +43,9 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-logo">
-          {brand.identity.logoUrl ? (
+          {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={brand.identity.logoUrl} alt={brand.copy.companyName} className="login-logo-img" />
+            <img src={logoUrl} alt={brand.copy.companyName} className="login-logo-img" />
           ) : (
             <div className="login-logo-icon">{brand.copy.shortName}</div>
           )}
