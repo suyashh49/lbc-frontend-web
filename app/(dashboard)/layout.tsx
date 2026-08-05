@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import Sidebar from '@/components/Sidebar';
+import ThemeToggle from '@/components/ThemeToggle';
 import { ToastProvider } from '@/components/Toast';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -30,7 +31,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <ToastProvider>
       <div className="app-layout">
         <Sidebar />
-        <main className="main-content">{children}</main>
+        <main className="main-content">
+          <div className="top-toolbar">
+            <ThemeToggle />
+          </div>
+          {children}
+        </main>
       </div>
     </ToastProvider>
   );

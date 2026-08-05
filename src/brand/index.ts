@@ -2,6 +2,7 @@ import type { Brand } from './types';
 import { lbcBrand } from './brands/lbc';
 import { acmeBrand } from './brands/acme';
 import { fedexBrand } from './brands/fedex';
+import { quadxBrand } from './brands/quadx';
 
 export type { Brand } from './types';
 
@@ -10,6 +11,7 @@ export const BRANDS: Record<string, Brand> = {
   lbc: lbcBrand,
   acme: acmeBrand,
   fedex: fedexBrand,
+  quadx: quadxBrand,
 };
 
 export const DEFAULT_BRAND = lbcBrand;
@@ -23,4 +25,19 @@ export const DEFAULT_BRAND = lbcBrand;
 export function getBrand(key?: string): Brand {
   const resolved = (key ?? process.env.NEXT_PUBLIC_BRAND ?? '').toLowerCase();
   return BRANDS[resolved] ?? DEFAULT_BRAND;
+}
+
+/**
+ * Picks the logo asset that contrasts with the current theme surface.
+ * Dark theme → `logoDarkUrl` (when present), else `logoUrl`.
+ * Light theme → `logoUrl`.
+ */
+export function resolveBrandLogoUrl(
+  brand: Brand,
+  theme: 'dark' | 'light' = 'dark',
+): string | undefined {
+  if (theme === 'dark' && brand.identity.logoDarkUrl) {
+    return brand.identity.logoDarkUrl;
+  }
+  return brand.identity.logoUrl;
 }
